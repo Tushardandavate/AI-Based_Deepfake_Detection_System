@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8"/>
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>Deepfake Detection</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+
+  min-height:100vh;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  overflow:hidden;
+
+  background:
+  radial-gradient(circle at 15% 20%,
+  rgba(255,0,255,0.25),
+  transparent 25%),
+
+  radial-gradient(circle at 80% 10%,
+  rgba(255,255,255,0.12),
+  transparent 20%),
+
+  radial-gradient(circle at 70% 80%,
+  rgba(0,183,255,0.25),
+  transparent 30%),
+
+  linear-gradient(
+  135deg,
+  #6948ff,
+  #5965ff,
+  #3f7dff
+  );
+
+  background-size:200% 200%;
+
+  animation:bgMove 10s ease infinite;
+
+  color:white;
+
+  padding:20px;
+}
+
+@keyframes bgMove{
+
+  0%{
+    background-position:0% 50%;
+  }
+
+  50%{
+    background-position:100% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
+
+}
+
+.container{
+
+  width:96%;
+
+  height:94vh;
+
+  background:rgba(255,255,255,0.06);
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(28px);
+
+  border-radius:35px;
+
+  padding:28px;
+
+  box-shadow:
+  0 10px 40px rgba(0,0,0,0.12),
+  inset 0 1px 1px rgba(255,255,255,0.08);
+
+  position:relative;
+
+  overflow:hidden;
+
+  animation:floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-6px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+
+}
+
+.container::before{
+
+  content:"";
+
+  position:absolute;
+
+  width:500px;
+  height:500px;
+
+  background:
+  radial-gradient(
+  rgba(255,255,255,0.12),
+  transparent 70%
+  );
+
+  top:-120px;
+  left:30%;
+
+  animation:glowMove 7s linear infinite;
+}
+
+@keyframes glowMove{
+
+  0%{
+    transform:translateX(-40px);
+  }
+
+  50%{
+    transform:translateX(40px);
+  }
+
+  100%{
+    transform:translateX(-40px);
+  }
+
+}
+
+.navbar{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  margin-bottom:25px;
+}
+
+.logo{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:14px;
+
+  font-size:2rem;
+
+  font-weight:700;
+}
+
+.logo i{
+
+  width:52px;
+  height:52px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.08);
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  border:1px solid rgba(255,255,255,0.1);
+
+  backdrop-filter:blur(15px);
+}
+
+.menu{
+
+  width:55px;
+  height:55px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.08);
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  border:1px solid rgba(255,255,255,0.10);
+
+  cursor:pointer;
+
+  transition:0.4s;
+}
+
+.menu:hover{
+
+  transform:scale(1.08);
+
+  background:rgba(255,255,255,0.16);
+}
+
+.main-content{
+
+  display:flex;
+
+  gap:25px;
+
+  height:calc(100% - 90px);
+}
+
+.left{
+
+  flex:1.5;
+
+  display:flex;
+
+  flex-direction:column;
+}
+
+.hero-section{
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(255,255,255,0.10);
+
+  border-radius:35px;
+
+  padding:35px;
+
+  flex:1;
+
+  backdrop-filter:blur(20px);
+}
+
+.left h1{
+
+  font-size:6rem;
+
+  line-height:0.95;
+
+  margin-bottom:25px;
+
+  font-weight:900;
+
+  animation:fadeUp 1s ease;
+}
+
+.left p{
+
+  font-size:1.25rem;
+
+  line-height:1.8;
+
+  opacity:0.92;
+
+  margin-bottom:30px;
+}
+
+@keyframes fadeUp{
+
+  from{
+    opacity:0;
+    transform:translateY(30px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+.upload-box{
+
+  width:100%;
+
+  height:250px;
+
+  border-radius:30px;
+
+  border:2px dashed rgba(255,255,255,0.15);
+
+  background:rgba(255,255,255,0.05);
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+
+  align-items:center;
+
+  text-align:center;
+
+  position:relative;
+
+  overflow:hidden;
+
+  backdrop-filter:blur(20px);
+
+  transition:0.4s;
+}
+
+.upload-box:hover{
+
+  transform:translateY(-6px);
+
+  background:rgba(255,255,255,0.09);
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.12);
+}
+
+.upload-box i{
+
+  font-size:4.5rem;
+
+  margin-bottom:18px;
+
+  animation:floatIcon 3s ease infinite;
+}
+
+@keyframes floatIcon{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-10px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+
+}
+
+.upload-box h3{
+
+  font-size:2.2rem;
+
+  margin-bottom:10px;
+}
+
+.upload-box span{
+
+  opacity:0.8;
+
+  font-size:1rem;
+}
+
+.upload-box input{
+
+  position:absolute;
+
+  width:100%;
+  height:100%;
+
+  opacity:0;
+
+  cursor:pointer;
+}
+
+.steps{
+
+  display:flex;
+
+  gap:20px;
+
+  margin-top:25px;
+}
+
+.step{
+
+  flex:1;
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(255,255,255,0.10);
+
+  border-radius:28px;
+
+  padding:25px;
+
+  text-align:center;
+
+  backdrop-filter:blur(20px);
+
+  transition:0.4s;
+}
+
+.step:hover{
+
+  transform:translateY(-8px);
+
+  background:rgba(255,255,255,0.10);
+}
+
+.step i{
+
+  font-size:2.2rem;
+
+  margin-bottom:15px;
+}
+
+.step h4{
+
+  margin-bottom:8px;
+
+  font-size:1.2rem;
+}
+
+.step p{
+
+  font-size:0.9rem;
+
+  line-height:1.5;
+
+  opacity:0.8;
+}
+
+.right{
+
+  width:420px;
+}
+
+.result-card{
+
+  width:100%;
+
+  height:100%;
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(255,255,255,0.10);
+
+  border-radius:35px;
+
+  padding:30px;
+
+  backdrop-filter:blur(25px);
+
+  display:flex;
+
+  flex-direction:column;
+
+  transition:0.4s;
+}
+
+.result-card:hover{
+
+  transform:translateY(-6px);
+}
+
+.result-card h2{
+
+  text-align:center;
+
+  margin-bottom:25px;
+
+  font-size:2.2rem;
+}
+
+.circle{
+
+  width:250px;
+  height:250px;
+
+  margin:auto;
+
+  border-radius:50%;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  background:
+  conic-gradient(
+  #00d4ff 0deg,
+  #66dfff 300deg,
+  rgba(255,255,255,0.08) 300deg
+  );
+
+  padding:18px;
+
+  /* ROTATION REMOVED */
+}
+
+.inner-circle{
+
+  width:100%;
+  height:100%;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,0.05);
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+
+  align-items:center;
+
+  backdrop-filter:blur(20px);
+
+  animation:heartBeat 2s infinite;
+}
+
+@keyframes heartBeat{
+
+  0%{
+    transform:scale(1);
+  }
+
+  25%{
+    transform:scale(1.05);
+  }
+
+  50%{
+    transform:scale(1);
+  }
+
+  75%{
+    transform:scale(1.05);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+
+}
+
+.inner-circle h1{
+
+  font-size:4.5rem;
+
+  margin-bottom:10px;
+}
+
+.status{
+
+  margin:28px auto;
+
+  width:220px;
+
+  text-align:center;
+
+  padding:16px;
+
+  border-radius:50px;
+
+  background:
+  linear-gradient(
+  135deg,
+  #ff0080,
+  #ff3d6e
+  );
+
+  font-size:1.3rem;
+
+  font-weight:700;
+
+  box-shadow:
+  0 0 25px rgba(255,0,128,0.35);
+
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.05);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+
+}
+
+.details{
+
+  margin-top:20px;
+}
+
+.details h3{
+
+  margin-bottom:18px;
+
+  font-size:2rem;
+}
+
+.details p{
+
+  margin-bottom:15px;
+
+  opacity:0.9;
+}
+
+.details span{
+
+  float:right;
+}
+
+video{
+
+  width:100%;
+
+  max-height:250px;
+
+  object-fit:cover;
+
+  margin-top:18px;
+
+  border-radius:20px;
+
+  display:none;
+}
+
+.loading{
+
+  display:none;
+
+  margin-top:20px;
+
+  text-align:center;
+}
+
+.spinner{
+
+  width:60px;
+  height:60px;
+
+  border:6px solid rgba(255,255,255,0.1);
+
+  border-top-color:white;
+
+  border-radius:50%;
+
+  margin:auto;
+
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+
+  to{
+    transform:rotate(360deg);
+  }
+
+}
+
+@media(max-width:1200px){
+
+  body{
+    overflow:auto;
+  }
+
+  .container{
+    height:auto;
+  }
+
+  .main-content{
+    flex-direction:column;
+  }
+
+  .right{
+    width:100%;
+  }
+
+  .left h1{
+    font-size:4rem;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="navbar">
+
+    <div class="logo">
+
+      <i class="fas fa-shield-alt"></i>
+
+      Deepfake Detection
+
+    </div>
+
+    <div class="menu">
+
+      <i class="fas fa-bars"></i>
+
+    </div>
+
+  </div>
+
+  <div class="main-content">
+
+    <div class="left">
+
+      <div class="hero-section">
+
+        <h1>
+
+          Detect Deepfakes <br>
+          Instantly with AI
+
+        </h1>
+
+        <p>
+
+          Upload your video and get accurate results in
+          just a few seconds using advanced AI analysis.
+
+        </p>
+
+        <div class="upload-box">
+
+          <i class="fas fa-cloud-upload-alt"></i>
+
+          <h3>
+
+            Drag & Drop your video here
+
+          </h3>
+
+          <span>
+
+            MP4, MOV, AVI up to 50MB
+
+          </span>
+
+          <input type="file"
+                 id="videoUpload"
+                 accept="video/*">
+
+        </div>
+
+        <div class="steps">
+
+          <div class="step">
+
+            <i class="fas fa-upload"></i>
+
+            <h4>Upload Video</h4>
+
+            <p>Select or drag your video file</p>
+
+          </div>
+
+          <div class="step">
+
+            <i class="fas fa-brain"></i>
+
+            <h4>AI Analysis</h4>
+
+            <p>Our AI analyzes the video frames</p>
+
+          </div>
+
+          <div class="step">
+
+            <i class="fas fa-check-circle"></i>
+
+            <h4>Get Results</h4>
+
+            <p>Receive accurate detection result</p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="right">
+
+      <div class="result-card">
+
+        <h2>Result</h2>
+
+        <div class="circle">
+
+          <div class="inner-circle">
+
+            <h1 id="confidencePercent">
+
+              0%
+
+            </h1>
+
+            <span>CONFIDENCE</span>
+
+          </div>
+
+        </div>
+
+        <div class="status"
+             id="resultValue">
+
+          WAITING
+
+        </div>
+
+        <div class="loading"
+             id="loadingContainer">
+
+          <div class="spinner"></div>
+
+          <p style="margin-top:15px">
+
+            AI analyzing video...
+
+          </p>
+
+        </div>
+
+        <div class="details">
+
+          <h3>Video Details</h3>
+
+          <p>
+
+            File Name
+            <span id="fileName">
+
+              No file
+
+            </span>
+
+          </p>
+
+        </div>
+
+        <video controls
+               id="videoPreview"></video>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const videoUpload =
+document.getElementById('videoUpload');
+
+const loadingContainer =
+document.getElementById('loadingContainer');
+
+const videoPreview =
+document.getElementById('videoPreview');
+
+const resultValue =
+document.getElementById('resultValue');
+
+const confidencePercent =
+document.getElementById('confidencePercent');
+
+const fileName =
+document.getElementById('fileName');
+
+videoUpload.addEventListener(
+'change',
+async(e)=>{
+
+  const file=e.target.files[0];
+
+  if(!file) return;
+
+  fileName.textContent=file.name;
+
+  videoPreview.src=
+  URL.createObjectURL(file);
+
+  videoPreview.style.display='block';
+
+  loadingContainer.style.display='block';
+
+  const formData=
+  new FormData();
+
+  formData.append('file',file);
+
+  try{
+
+    const response=
+    await fetch('/detect/',{
+
+      method:'POST',
+
+      body:formData
+
+    });
+
+    const result=
+    await response.json();
+
+    loadingContainer.style.display='none';
+
+    const confidence=
+    Math.round(result.confidence*100);
+
+    confidencePercent.textContent=
+    confidence+'%';
+
+    if(result.fake){
+
+      resultValue.textContent='FAKE';
+
+      resultValue.style.background=
+      'linear-gradient(135deg,#ff0080,#ff3d6e)';
+
+    }
+
+    else{
+
+      resultValue.textContent='REAL';
+
+      resultValue.style.background=
+      'linear-gradient(135deg,#00ff99,#00c3ff)';
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    loadingContainer.style.display='none';
+
+    alert('Error analyzing video');
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
